@@ -1,4 +1,4 @@
-use crate::models::Song;
+use crate::models::song::Song;
 use hyper::{Body, Request, Response};
 use juniper::{
     http::{graphiql::graphiql_source, GraphQLRequest},
@@ -30,7 +30,8 @@ pub struct QueryRoot;
 #[juniper::graphql_object]
 impl QueryRoot {
     fn song(_id: String) -> FieldResult<Song> {
-        Ok(Song::default())
+        // Ok(Song)
+        todo!()
     }
 }
 
