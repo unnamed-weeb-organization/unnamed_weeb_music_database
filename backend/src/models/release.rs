@@ -1,4 +1,4 @@
-use super::{artist::Artist, Name};
+use super::{artist::Artist, ExternalSites, Name};
 use juniper::{GraphQLEnum, GraphQLObject};
 
 #[derive(GraphQLEnum)]
@@ -20,5 +20,5 @@ pub struct Release {
     release_artists: Vec<Artist>,
     total_tracks: i32,
     /// Contains an array of external links (YouTube, Apple Music and etc)
-    external_sites: Vec<String>,
+    external_sites: Vec<ExternalSites>,
 }
