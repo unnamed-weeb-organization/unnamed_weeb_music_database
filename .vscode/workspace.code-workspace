@@ -1,0 +1,16 @@
+{
+  "extensions": {
+    "recommendations": ["rust-lang.rust-analyzer"]
+  },
+  "folders": [
+    {
+      "name": "Backend",
+      "path": "../backend"
+    },
+    {
+      "name": "Root",
+      "path": ".."
+    }
+  ],
+  "settings": {}
+}
