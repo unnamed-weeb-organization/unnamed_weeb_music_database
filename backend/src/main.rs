@@ -1,4 +1,5 @@
 mod constants;
+mod controllers;
 mod models;
 mod utils;
 

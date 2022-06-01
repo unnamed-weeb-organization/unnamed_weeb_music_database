@@ -1,11 +1,11 @@
 use hyper::{header, Body, Request, Response};
 use routerify::ext::RequestExt;
-use std::convert::Infallible;
+use std::io;
 use tracing::info;
 
 use crate::constants;
 
-pub async fn setup_cors(mut req: Response<Body>) -> Result<Response<Body>, Infallible> {
+pub async fn setup_cors(mut req: Response<Body>) -> Result<Response<Body>, io::Error> {
     let headers = req.headers_mut();
 
     headers.insert(
@@ -16,7 +16,7 @@ pub async fn setup_cors(mut req: Response<Body>) -> Result<Response<Body>, Infal
     Ok(req)
 }
 
-pub async fn logger(req: Request<Body>) -> Result<Request<Body>, Infallible> {
+pub async fn logger(req: Request<Body>) -> Result<Request<Body>, io::Error> {
     info!(
         "{} {} {}",
         req.remote_addr(),

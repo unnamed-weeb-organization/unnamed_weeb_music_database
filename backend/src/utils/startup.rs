@@ -1,9 +1,10 @@
 use hyper::{server::conn::AddrIncoming, Body, Server};
 use routerify::{Middleware, Router, RouterService};
-use std::{convert::Infallible, net::SocketAddr};
+use std::{io, net::SocketAddr, sync::Arc};
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
-pub type ServerStart = Server<AddrIncoming, RouterService<Body, Infallible>>;
+
+pub type ServerStart = Server<AddrIncoming, RouterService<Body, io::Error>>;
 
 pub fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
     let subscriber = FmtSubscriber::builder()
@@ -11,9 +12,13 @@ pub fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
         .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
-    let router: Router<Body, Infallible> = Router::builder()
+    let schema = Arc::new(crate::controllers::graphql::make_schema());
+
+    let router: Router<Body, io::Error> = Router::builder()
+        .data(schema)
         .middleware(Middleware::pre(super::middleware::logger))
         .middleware(Middleware::post(super::middleware::setup_cors))
+        .scope("/", crate::controllers::handle_routes())
         .build()
         .unwrap();
 
