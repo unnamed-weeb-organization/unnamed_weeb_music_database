@@ -19,6 +19,7 @@ pub fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
         .middleware(Middleware::pre(super::middleware::logger))
         .middleware(Middleware::post(super::middleware::setup_cors))
         .scope("/", crate::controllers::handle_routes())
+        .err_handler(super::middleware::handle_error)
         .build()
         .unwrap();
 

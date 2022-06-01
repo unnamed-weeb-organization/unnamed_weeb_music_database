@@ -1,9 +1,9 @@
-use hyper::{header, Body, Request, Response};
-use routerify::ext::RequestExt;
-use std::io;
-use tracing::info;
-
+use super::error::{Error, ErrorResponse};
 use crate::constants;
+use hyper::{header, Body, Request, Response};
+use routerify::{ext::RequestExt, RouteError};
+use std::io;
+use tracing::{error, info};
 
 pub async fn setup_cors(mut req: Response<Body>) -> Result<Response<Body>, io::Error> {
     let headers = req.headers_mut();
@@ -24,4 +24,16 @@ pub async fn logger(req: Request<Body>) -> Result<Request<Body>, io::Error> {
         req.uri().path()
     );
     Ok(req)
+}
+
+pub async fn handle_error(err: RouteError) -> Response<Body> {
+    error!("Error occurred while serving a request {err}");
+
+    let err = err.downcast::<Error>().unwrap();
+    let json = serde_json::to_string(&ErrorResponse::from(err.clone()));
+
+    Response::builder()
+        .status(err.status_code)
+        .body(Body::from(json.unwrap()))
+        .unwrap()
 }
