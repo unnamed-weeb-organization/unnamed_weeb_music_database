@@ -1,3 +1,4 @@
+use crate::{controllers, utils::middleware};
 use hyper::{server::conn::AddrIncoming, Body, Server};
 use routerify::{Middleware, Router, RouterService};
 use std::{io, net::SocketAddr, sync::Arc};
@@ -12,14 +13,14 @@ pub fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
         .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
-    let schema = Arc::new(crate::controllers::graphql::make_schema());
+    let schema = Arc::new(controllers::graphql::make_schema());
 
     let router: Router<Body, io::Error> = Router::builder()
         .data(schema)
-        .middleware(Middleware::pre(super::middleware::logger))
-        .middleware(Middleware::post(super::middleware::setup_cors))
-        .scope("/", crate::controllers::handle_routes())
-        .err_handler(super::middleware::handle_error)
+        .middleware(Middleware::pre(middleware::logger))
+        .middleware(Middleware::post(middleware::setup_headers))
+        .scope("/", controllers::handle_routes())
+        .err_handler(middleware::handle_error)
         .build()
         .unwrap();
 
