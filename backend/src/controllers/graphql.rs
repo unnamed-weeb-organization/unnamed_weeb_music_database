@@ -1,13 +1,13 @@
-use crate::models::song::Song;
+use crate::{models::song::Song, utils::context::Context};
 use hyper::{Body, Request, Response};
 use juniper::{
     http::{graphiql::graphiql_source, GraphQLRequest},
-    EmptyMutation, EmptySubscription, FieldResult, RootNode,
+    EmptyMutation, EmptySubscription, FieldResult, RootNode, graphql_object,
 };
 use routerify::prelude::*;
 use std::{io, sync::Arc};
 
-pub type Schema = RootNode<'static, QueryRoot, EmptyMutation, EmptySubscription>;
+pub type Schema = RootNode<'static, QueryRoot, EmptyMutation<Context>, EmptySubscription<Context>>;
 type LocalSchema = Arc<Schema>;
 
 pub async fn graphiql(_: Request<Body>) -> Result<Response<Body>, io::Error> {
@@ -17,8 +17,9 @@ pub async fn graphiql(_: Request<Body>) -> Result<Response<Body>, io::Error> {
 
 pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
     let data = req.data::<LocalSchema>().unwrap().clone();
+	let ctx = req.data::<Context>().unwrap().clone();
     let request = deserialize_body(req.into_body()).await?;
-    let response = request.execute(&data, &()).await;
+    let response = request.execute(&data, &ctx).await;
 
     Ok(Response::new(Body::from(
         serde_json::to_string(&response).unwrap(),
@@ -27,7 +28,7 @@ pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
 
 pub struct QueryRoot;
 
-#[juniper::graphql_object]
+#[graphql_object(context = Context)]
 impl QueryRoot {
     fn song(_id: String) -> FieldResult<Song> {
         // Ok(Song)
@@ -36,7 +37,7 @@ impl QueryRoot {
 }
 
 pub fn make_schema() -> Schema {
-    Schema::new(QueryRoot {}, EmptyMutation::new(), EmptySubscription::new())
+    Schema::new(QueryRoot {}, EmptyMutation::<Context>::new(), EmptySubscription::<Context>::new())
 }
 
 async fn deserialize_body(body: Body) -> Result<GraphQLRequest, io::Error> {

@@ -9,7 +9,7 @@ use utils::{config, startup};
 #[tokio::main]
 async fn main() {
     let conf = config::get_config();
-    let (server, addr) = startup::up(conf);
+    let (server, addr) = startup::up(conf).await;
 
     info!("App is running on: {}", addr);
 
