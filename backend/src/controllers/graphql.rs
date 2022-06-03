@@ -19,8 +19,6 @@ pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
     let data = req.data::<LocalSchema>().unwrap().clone();
 	let ctx = req.data::<Context>().unwrap().clone();
     let request = deserialize_body(req.into_body()).await?;
-
-	println!("{:?}", ctx);
     let response = request.execute(&data, &ctx).await;
 
     Ok(Response::new(Body::from(
