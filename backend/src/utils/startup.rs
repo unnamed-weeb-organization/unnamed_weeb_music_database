@@ -1,3 +1,4 @@
+use crate::{controllers, utils::middleware};
 use hyper::{server::conn::AddrIncoming, Body, Server};
 use routerify::{Middleware, Router, RouterService};
 use sqlx::postgres::PgPoolOptions;
@@ -13,23 +14,24 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
         .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
-	let pool = PgPoolOptions::new()
-		.max_connections(conf.db.max_connections)
-		.connect_timeout(conf.db.connect_timeout)
-		.connect(&conf.db.url)
-		.await
-		.unwrap();
+    let pool = PgPoolOptions::new()
+      .max_connections(conf.db.max_connections)
+      .connect_timeout(conf.db.connect_timeout)
+      .connect(&conf.db.url)
+      .await
+      .unwrap();
 
-	let ctx = crate::utils::context::Context::new(pool);
+    let ctx = crate::utils::context::Context::new(pool);
 
     let schema = Arc::new(crate::controllers::graphql::make_schema());
 
     let router: Router<Body, io::Error> = Router::builder()
         .data(schema)
-		.data(ctx)
-        .middleware(Middleware::pre(super::middleware::logger))
-        .middleware(Middleware::post(super::middleware::setup_cors))
-        .scope("/", crate::controllers::handle_routes())
+		    .data(ctx)
+        .middleware(Middleware::pre(middleware::logger))
+        .middleware(Middleware::post(middleware::setup_cors))
+        .scope("/", controllers::handle_routes())
+        .err_handler(middleware::handle_error)
         .build()
         .unwrap();
 

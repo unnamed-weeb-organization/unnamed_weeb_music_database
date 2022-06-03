@@ -1,6 +1,6 @@
 {
   "extensions": {
-    "recommendations": ["rust-lang.rust-analyzer"]
+    "recommendations": ["rust-lang.rust-analyzer", "vadimcn.vscode-lldb"]
   },
   "folders": [
     {

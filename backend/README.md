@@ -1,3 +1,9 @@
 # Backend
 
-GraphQl backend for handling/adding data to the database.
+GraphQL backend for querying/mutating data from/to the database.
+
+## Prerequisites
+
+- PostgreSQL
+
+- `rustc` version 1.6 or higher.
