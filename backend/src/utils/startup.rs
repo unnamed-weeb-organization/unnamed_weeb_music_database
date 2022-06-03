@@ -15,11 +15,11 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
     let pool = PgPoolOptions::new()
-      .max_connections(conf.db.max_connections)
-      .connect_timeout(conf.db.connect_timeout)
-      .connect(&conf.db.url)
-      .await
-      .unwrap();
+        .max_connections(conf.db.max_connections)
+        .connect_timeout(conf.db.connect_timeout)
+        .connect(&conf.db.url)
+        .await
+        .unwrap();
 
     let ctx = crate::utils::context::Context::new(pool);
 
@@ -27,9 +27,9 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
 
     let router: Router<Body, io::Error> = Router::builder()
         .data(schema)
-		    .data(ctx)
+		.data(ctx)
         .middleware(Middleware::pre(middleware::logger))
-        .middleware(Middleware::post(middleware::setup_cors))
+        .middleware(Middleware::post(middleware::setup_headers))
         .scope("/", controllers::handle_routes())
         .err_handler(middleware::handle_error)
         .build()
