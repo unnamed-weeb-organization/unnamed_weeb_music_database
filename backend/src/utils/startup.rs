@@ -39,7 +39,5 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
     let addr = SocketAddr::new(conf.ip, conf.port);
     let server = Server::bind(&addr).serve(service);
 
-
-
     (server, addr)
 }
