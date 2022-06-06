@@ -1,12 +1,14 @@
+use std::sync::Arc;
+
 #[derive(Clone, Debug)]
 pub struct Context {
-	db: sqlx::postgres::PgPool,
+	pub db: Arc<sqlx::postgres::PgPool>,
 }
 
 impl juniper::Context for Context {}
 
 impl Context {
 	pub fn new(db: sqlx::Pool<sqlx::Postgres>) -> Self {
-		Self { db }
+		Self { db: Arc::new(db) }
 	}
 }
