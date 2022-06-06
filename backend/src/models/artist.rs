@@ -1,5 +1,6 @@
 use super::{Name, ExternalSites};
 use juniper::GraphQLObject;
+use sqlx::FromRow;
 
 // #[derive(GraphQLEnum)]
 // pub enum ArtistType {
@@ -9,7 +10,7 @@ use juniper::GraphQLObject;
 //     Remixer,
 // }
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone, Debug, FromRow)]
 pub struct Artist {
     id: String,
     name: Name,

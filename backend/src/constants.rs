@@ -8,6 +8,8 @@ pub const ENV_CONFIG_PATH: &str = "UNK_DB_CONFIG";
 pub const SERVER_DEFAULT_PORT: u16 = 6001;
 pub const SERVER_DEFAULT_IP: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
 pub static ALLOWED_CONTROL_HOSTS: HeaderValue = HeaderValue::from_static("*");
+
+// Database default values
 pub static DB_DEFAULT_CONNECT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 pub static DB_DEFAULT_MAX_CONNECTIONS: u32 = 10;
-pub static DB_DEFAULT_URL: &str = "postgres://postgres:postgres@localhost:5432/postgres";
+pub static DB_DEFAULT_URL: &str = "postgres://weeb:password1@localhost:5432/weeb";

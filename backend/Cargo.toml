@@ -31,3 +31,6 @@ juniper = "0.15.9"
 
 # SQLx (postgres)
 sqlx = { version = "0.5", features = [ "runtime-tokio-native-tls" , "postgres" ] }
+
+# Ulid for generating unique ids
+ulid = "0.5.0"

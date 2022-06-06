@@ -1,12 +1,12 @@
 use super::{artist::Artist, release::Release, ExternalSites, Name};
 use juniper::GraphQLObject;
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone, Debug)]
 pub struct Song {
-    id: String,
-    name: Name,
-    artists: Vec<Artist>,
-    releases: Vec<Release>,
+    pub id: String,
+    pub name: Name,
+    /*pub artists: Vec<Artist>,
+    pub releases: Vec<Release>,
     /// Contains an array of external links (YouTube, Apple Music and etc)
-    external_sites: Vec<ExternalSites>,
+    pub external_sites: Vec<ExternalSites>,*/
 }

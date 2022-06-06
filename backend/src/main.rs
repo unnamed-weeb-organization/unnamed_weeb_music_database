@@ -2,6 +2,7 @@ mod constants;
 mod controllers;
 mod models;
 mod utils;
+mod database;
 
 use tracing::info;
 use utils::{config, startup};

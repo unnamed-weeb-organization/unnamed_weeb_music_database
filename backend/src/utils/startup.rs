@@ -27,7 +27,7 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
 
     let router: Router<Body, io::Error> = Router::builder()
         .data(schema)
-	.data(ctx)
+        .data(ctx)
         .middleware(Middleware::pre(middleware::logger))
         .middleware(Middleware::post(middleware::setup_headers))
         .scope("/", controllers::handle_routes())

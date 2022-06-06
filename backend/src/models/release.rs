@@ -1,14 +1,14 @@
 use super::{artist::Artist, ExternalSites, Name};
 use juniper::{GraphQLEnum, GraphQLObject};
 
-#[derive(GraphQLEnum)]
+#[derive(GraphQLEnum, Clone, Debug)]
 pub enum ReleaseType {
     Album,
     Single,
     EP,
 }
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone, Debug)]
 /// Release done by one or multiple artist
 ///
 /// This structure simply represents an album but has a fancy name to not to

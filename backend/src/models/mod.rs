@@ -3,8 +3,9 @@ pub mod release;
 pub mod song;
 
 use juniper::{GraphQLEnum, GraphQLObject};
+use sqlx::{Decode, Database, database::HasValueRef};
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone, Debug, sqlx::Type)]
 pub struct Name {
     /// Native name the original variant uses.
     ///
@@ -17,17 +18,17 @@ pub struct Name {
     /// English translated name.
     ///
     /// "The Cruel Angel's Thesis"
-    english: Option<String>,
+    english: String,
 }
 
-#[derive(GraphQLEnum)]
+#[derive(GraphQLEnum, Clone, Debug)]
 pub enum ExternalSite {
     AppleMusic,
     YouTube,
     Spotify,
 }
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Clone, Debug)]
 pub struct ExternalSites {
     site_type: ExternalSite,
     url: String,
