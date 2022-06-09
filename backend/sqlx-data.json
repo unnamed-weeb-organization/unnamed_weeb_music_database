@@ -1,0 +1,164 @@
+{
+  "db": "PostgreSQL",
+  "1c85fa04d95d643260221b64983647fda0e034649ef2b2052abb821ce8e98d99": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n\t\t\tselect\n\t\t\t\ta.id,\n\t\t\t\ta.name as \"name!: Name\"\n\t\t\tfrom\n\t\t\t\tsongs_artists sa\n\t\t\tleft join artists a on (a.id = sa.artist_id)\n\t\t\twhere sa.song_id = $1;\n\t\t\t"
+  },
+  "46932bb0ca94ce58de65414323872ca1f8025462b5d0b85643d03b0e200fb61f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        },
+        {
+          "name": "release_type!: ReleaseType",
+          "ordinal": 2,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Album",
+                  "Single",
+                  "EP"
+                ]
+              },
+              "name": "releasetype"
+            }
+          }
+        },
+        {
+          "name": "total_tracks!: i32",
+          "ordinal": 3,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n\t\t\tselect\n\t\t\t\tr.id,\n\t\t\t\tr.name as \"name!: Name\",\n\t\t\t\tr.release_type as \"release_type!: ReleaseType\",\n\t\t\t\tr.total_tracks as \"total_tracks!: i32\"\n\t\t\tfrom\n\t\t\t\tsongs_releases sr\n\t\t\tleft join releases r on (r.id = sr.releases_id)\n\t\t\twhere sr.songs_id = $1;\n\t\t\t"
+  },
+  "ba7561c27eab4d1f74e3da69c92916f5b3e1555b85cb2e19e8c7de8e63ee921e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n\t\t\tselect\n\t\t\t\ts.id,\n\t\t\t\ts.name as \"name!: Name\"\n\t\t\tfrom\n\t\t\t\tsongs s\n\t\t\twhere s.id = $1;\n\t\t\t"
+  }
+}
