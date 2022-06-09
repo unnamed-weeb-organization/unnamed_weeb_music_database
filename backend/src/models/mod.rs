@@ -3,9 +3,9 @@ pub mod release;
 pub mod song;
 
 use juniper::{GraphQLEnum, GraphQLObject};
-use sqlx::{Decode, Database, database::HasValueRef};
 
-#[derive(GraphQLObject, Clone, Debug, sqlx::Type)]
+
+#[derive(GraphQLObject, Clone, Debug)]
 pub struct Name {
     /// Native name the original variant uses.
     ///
@@ -33,3 +33,31 @@ pub struct ExternalSites {
     site_type: ExternalSite,
     url: String,
 }
+
+#[automatically_derived]
+    impl<'r> ::sqlx::decode::Decode<'r, ::sqlx::Postgres> for Name {
+        fn decode(
+            value: ::sqlx::postgres::PgValueRef<'r>,
+        ) -> ::std::result::Result<
+            Self,
+            ::std::boxed::Box<
+                dyn ::std::error::Error + 'static + ::std::marker::Send + ::std::marker::Sync,
+            >,
+        > {
+            let mut decoder = ::sqlx::postgres::types::PgRecordDecoder::new(value)?;
+            let native = decoder.try_decode::<String>()?;
+            let romanized = decoder.try_decode::<String>()?;
+            let english = decoder.try_decode::<String>()?;
+            ::std::result::Result::Ok(Name {
+                native,
+                romanized,
+                english,
+            })
+        }
+    }
+    #[automatically_derived]
+    impl ::sqlx::Type<::sqlx::Postgres> for Name {
+        fn type_info() -> ::sqlx::postgres::PgTypeInfo {
+            ::sqlx::postgres::PgTypeInfo::with_name("localized_name")
+        }
+    }

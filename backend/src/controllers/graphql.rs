@@ -30,9 +30,9 @@ pub struct QueryRoot;
 
 #[graphql_object(context = Context)]
 impl QueryRoot {
-    async fn song<'ctx>(_id: String, context: &'ctx Context) -> FieldResult<Song> {
+    async fn song<'ctx>(id: String, context: &'ctx Context) -> FieldResult<Song> {
         // Ok(Song)
-		let s = Song::get("01G4TC98PRF35WGJCKCB09Y1P1", &*context.db).await.unwrap();
+		let s = Song::get_song_by_id(id, &*context.db).await.unwrap();
 		Ok(s)
         //todo!()
     }

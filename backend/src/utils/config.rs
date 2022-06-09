@@ -34,6 +34,7 @@ pub struct Db {
 	pub connect_timeout: std::time::Duration,
 	pub url: String,
 }
+
 impl Default for Db {
 	fn default() -> Self {
 		Self {

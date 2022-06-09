@@ -1,24 +1,49 @@
-use super::{artist::Artist, ExternalSites, Name};
-use juniper::{GraphQLEnum, GraphQLObject};
+use super::Name;
+use juniper::GraphQLEnum;
+use ulid::Ulid;
 
-#[derive(GraphQLEnum, Clone, Debug)]
+#[derive(GraphQLEnum, Clone, Debug, sqlx::Type)]
 pub enum ReleaseType {
     Album,
     Single,
     EP,
 }
 
-#[derive(GraphQLObject, Clone, Debug)]
+#[derive(Clone, Debug)]
 /// Release done by one or multiple artist
 ///
 /// This structure simply represents an album but has a fancy name to not to
 /// confuse it with [`ReleaseType::Album`]
 pub struct Release {
-    id: String,
-    name: Name,
-    release_type: ReleaseType,
-    release_artists: Vec<Artist>,
-    total_tracks: i32,
-    /// Contains an array of external links (YouTube, Apple Music and etc)
-    external_sites: Vec<ExternalSites>,
+    pub id: Ulid,
+    pub name: Name,
+    pub release_type: ReleaseType,
+    pub total_tracks: i32,
+}
+
+#[graphql_object]
+impl Release {
+    fn id(&self) -> String {
+        self.id.to_string()
+    }
+
+    fn name(&self) -> &Name {
+        &self.name
+    }
+
+    fn release_type(&self) -> &ReleaseType {
+        &self.release_type
+    }
+
+    fn total_tracks(&self) -> &i32 {
+        &self.total_tracks
+    }
+
+    /*fn artists(&self, context: &Context) -> Vec<Artist> {
+        Artist::get_artists_by_release_id(&self.id, context.db).unwrap()
+    }
+
+    fn songs(&self, context: &Context) -> Vec<Song> {
+        Song::get_songs_by_release_id(&self.id, context.db).unwrap()
+    }*/
 }

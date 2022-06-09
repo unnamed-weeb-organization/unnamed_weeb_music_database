@@ -7,6 +7,8 @@ mod database;
 use tracing::info;
 use utils::{config, startup};
 
+#[macro_use] extern crate juniper;
+
 #[tokio::main]
 async fn main() {
     let conf = config::get_config();

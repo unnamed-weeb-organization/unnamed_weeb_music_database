@@ -1691,6 +1691,7 @@ name = "unnamed_weeb_music_database"
 version = "0.1.0"
 dependencies = [
  "confy",
+ "dotenv",
  "futures",
  "hyper",
  "juniper",

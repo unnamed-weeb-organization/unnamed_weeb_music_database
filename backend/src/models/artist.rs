@@ -1,6 +1,5 @@
-use super::{Name, ExternalSites};
-use juniper::GraphQLObject;
-use sqlx::FromRow;
+use super::Name;
+use ulid::Ulid;
 
 // #[derive(GraphQLEnum)]
 // pub enum ArtistType {
@@ -10,11 +9,22 @@ use sqlx::FromRow;
 //     Remixer,
 // }
 
-#[derive(GraphQLObject, Clone, Debug, FromRow)]
+#[derive(Clone, Debug)]
 pub struct Artist {
-    id: String,
-    name: Name,
-    /// Contains an array of external links (YouTube, Apple Music and etc)
-    external_sites: Vec<ExternalSites>,
+    pub id: Ulid,
+    pub name: Name,
+    ///// Contains an array of external links (YouTube, Apple Music and etc)
+    //pub external_sites: Option<Vec<ExternalSites>>,
     // artist_type: ArtistType, <- TODO: Find a better way to handle artist types without trying to duplicate the source.
+}
+
+#[graphql_object]
+impl Artist {
+    fn id(&self) -> String {
+        self.id.to_string()
+    }
+
+    fn name(&self) -> &Name {
+        &self.name
+    }
 }
