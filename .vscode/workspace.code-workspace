@@ -1,6 +1,11 @@
 {
   "extensions": {
-    "recommendations": ["rust-lang.rust-analyzer", "vadimcn.vscode-lldb", "Vue.volar"]
+    "recommendations": [
+      "rust-lang.rust-analyzer",
+      "vadimcn.vscode-lldb",
+      "Vue.volar",
+      "esbenp.prettier-vscode"
+    ]
   },
   "folders": [
     {
@@ -9,7 +14,7 @@
     },
     {
       "name": "Frontend",
-      "path": "../frontend",
+      "path": "../frontend"
     },
     {
       "name": "Root",
@@ -17,6 +22,6 @@
     }
   ],
   "settings": {
-    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.checkOnSave.command": "clippy"
   }
 }
