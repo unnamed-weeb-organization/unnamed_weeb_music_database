@@ -52,7 +52,7 @@ pub async fn get_songs(options: &Options, db: &PgPool) -> Result<Vec<Song>, Erro
 	Ok(songs)
 }
 
-pub async fn create_song(ulid: ulid::Ulid, name: Name, artists: Vec<String>, releases: Option<Vec<String>>, db: &PgPool) -> Result<Song, Error> {
+pub async fn create_song(ulid: ulid::Ulid, name: Name, _artists: Vec<String>, _releases: Option<Vec<String>>, db: &PgPool) -> Result<Song, Error> {
 	let (query, values) = Query::insert()
 		.into_table(SongIden::Table)
 		.columns([SongIden::Id, SongIden::Name])
