@@ -4,16 +4,16 @@ pub mod song;
 
 use std::error::Error;
 
-use juniper::{GraphQLEnum, GraphQLObject};
+use async_graphql::{Enum, InputObject, Object};
 
-#[derive(Clone, Debug, juniper::GraphQLInputObject)]
+#[derive(Clone, Debug, InputObject)]
 pub struct NewName {
     pub native: String,
     pub romanized: String,
     pub english: String,
 }
 
-#[derive(GraphQLObject, Clone, Debug, sqlx::Encode)]
+#[derive(Clone, Debug, sqlx::Encode)]
 pub struct Name {
     /// Native name the original variant uses.
     ///
@@ -29,17 +29,43 @@ pub struct Name {
     pub english: String,
 }
 
-#[derive(GraphQLEnum, Clone, Debug)]
+#[Object]
+impl Name {
+    pub async fn native(&self) -> &str {
+        &self.native
+    }
+
+    pub async fn romanized(&self) -> &str {
+        &self.romanized
+    }
+
+    pub async fn english(&self) -> &str {
+        &self.english
+    }
+}
+
+#[derive(Enum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ExternalSite {
     AppleMusic,
     YouTube,
     Spotify,
 }
 
-#[derive(GraphQLObject, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct ExternalSites {
     site_type: ExternalSite,
     url: String,
+}
+
+#[Object]
+impl ExternalSites {
+    pub async fn site_type(&self) -> ExternalSite {
+        self.site_type
+    }
+
+    pub async fn url(&self) -> String {
+        self.url.clone()
+    }
 }
 
 impl<'r> sqlx::decode::Decode<'r, sqlx::Postgres> for Name {

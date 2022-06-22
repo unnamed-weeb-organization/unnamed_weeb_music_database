@@ -1,14 +1,12 @@
-use crate::{models::{song::{Song, NewSong}, Name, artist::Artist}, utils::context::Context, controllers::page::{Page, PageInfo}};
+use crate::{models::{song::{Song, NewSong}, Name, artist::Artist}, controllers::page::{Page, PageInfo}, utils::error::Error};
 use hyper::{Body, Request, Response};
-use juniper::{
-    http::{graphiql::graphiql_source, GraphQLRequest}, EmptySubscription, FieldResult, RootNode, graphql_object, LookAheadMethods,
+use async_graphql::{
+    http::graphiql_source,
+    Schema, EmptySubscription, Object, Context
 };
 use routerify::prelude::*;
 use sqlx::PgPool;
 use std::{io, sync::Arc};
-
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<Context>>;
-type LocalSchema = Arc<Schema>;
 
 pub async fn graphiql(_: Request<Body>) -> Result<Response<Body>, io::Error> {
     let html = graphiql_source("/graphql", None);
@@ -16,11 +14,10 @@ pub async fn graphiql(_: Request<Body>) -> Result<Response<Body>, io::Error> {
 }
 
 pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
-    let data = req.data::<LocalSchema>().unwrap().clone();
+    let schema = &*req.data::<Arc<Schema<QueryRoot, MutationRoot, EmptySubscription>>>().unwrap().clone();
     let db = req.data::<PgPool>().unwrap().clone();
-	let ctx = Context::new(db.clone());
     let request = deserialize_body(req.into_body()).await?;
-    let response = request.execute(&data, &ctx).await;
+    let response = schema.execute(request.data(db)).await;
 
     Ok(Response::new(Body::from(
         serde_json::to_string(&response).unwrap(),
@@ -29,11 +26,11 @@ pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
 
 pub struct QueryRoot;
 
-#[graphql_object(context = Context)]
+#[Object]
 impl QueryRoot {
-    async fn Song<'ctx>(id: Option<String>, search: Option<String>, artist_id: Option<String>, release_id: Option<String>, genres: Option<Vec<String>>, context: &'ctx Context) -> FieldResult<Song> {
+    async fn song<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, artist_id: Option<String>, release_id: Option<String>, genres: Option<Vec<String>>) -> Result<Song, Error> {
         // Ok(Song)
-        let db = &*context.db;
+        let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::song::Options {
             id: None,
             search: None,
@@ -67,9 +64,9 @@ impl QueryRoot {
         Ok(crate::database::song::get_song(&options, db).await.unwrap())
     }
 
-    async fn Artist<'ctx>(id: Option<String>, search: Option<String>, song_id: Option<String>, release_id: Option<String>, context: &'ctx Context) -> FieldResult<Artist> {
+    async fn artist<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, song_id: Option<String>, release_id: Option<String>) -> Result<Artist, Error> {
         // Ok(Artist)
-        let db = &*context.db;
+        let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::artist::Options {
             id: None,
             search: None,
@@ -98,7 +95,7 @@ impl QueryRoot {
         Ok(crate::database::artist::get_artist(&options, db).await.unwrap())
     }
 
-    async fn Page<'ctx>(page: Option<i32>, per_page: Option<i32>, _context: &'ctx Context) -> FieldResult<Page> {
+    async fn page<'ctx>(&self, page: Option<i32>, per_page: Option<i32>) -> Result<Page, Error> {
         let page_info = PageInfo {
             total: 0,
             per_page,
@@ -127,13 +124,15 @@ impl QueryRoot {
 
 pub struct MutationRoot;
 
-#[graphql_object(context = Context)]
+#[Object]
 impl MutationRoot {
-    async fn create_song(
-        context: &Context,
+    async fn create_song<'a>(
+        &self,
+        context: &Context<'a>,
         input: NewSong,
-    ) -> FieldResult<Song> {
+    ) -> Result<Song, Error> {
         // Ok(Song)
+        let db = &*context.data_unchecked::<PgPool>();
         let ulid = ulid::Ulid::new();
         let name = Name {
             native: input.name.native,
@@ -143,19 +142,29 @@ impl MutationRoot {
         let artists = input.artists;
         let releases = input.releases;
 
-        Ok(crate::database::song::create_song(ulid, name, artists, Some(releases), &*context.db).await.unwrap())
+        Ok(crate::database::song::create_song(ulid, name, artists, Some(releases), db).await.unwrap())
         //todo!()
     }
 }
 
-pub fn make_schema() -> Schema {
-    Schema::new(QueryRoot {}, MutationRoot, EmptySubscription::<Context>::new())
+pub fn make_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
+    Schema::build(QueryRoot {}, MutationRoot, EmptySubscription)
+        .finish()
 }
 
-async fn deserialize_body(body: Body) -> Result<GraphQLRequest, io::Error> {
+async fn deserialize_body(body: Body) -> Result<async_graphql::Request, io::Error> {
     let bytes = hyper::body::to_bytes(body).await.unwrap();
-    let request: Result<GraphQLRequest, serde_json::Error> =
-        serde_json::from_slice(&bytes.to_vec());
+    // Set the options for the request.
+    let options = async_graphql::http::MultipartOptions::default();
 
-    Ok(request.unwrap())
+
+    // Convert the bytes into a cursor. To get an implementation of AsyncRead.
+    let reader = futures::io::Cursor::new(bytes);
+
+    let req = async_graphql::http::receive_body(Some("application/json"), reader, options).await;
+
+    req.map_err(|err| {
+        io::Error::new(io::ErrorKind::Other, err)
+    })
+
 }

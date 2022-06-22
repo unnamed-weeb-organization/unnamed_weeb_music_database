@@ -6,9 +6,7 @@ use sea_query::{Query, Expr, PostgresQueryBuilder, JoinType, Values};
 use sqlx::PgPool;
 
 
-use self::sea_query_driver_postgres::bind_query_as;
-
-sea_query::sea_query_driver_postgres!();
+use crate::sea_query_driver_postgres::bind_query_as;
 
 /// Returns a song with the given id from the database.
 ///

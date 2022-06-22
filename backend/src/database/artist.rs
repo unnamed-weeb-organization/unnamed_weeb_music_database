@@ -7,9 +7,7 @@ use sqlx::PgPool;
 use ulid::Ulid;
 use sea_query::{Query, Expr, PostgresQueryBuilder, JoinType, Values};
 
-use self::sea_query_driver_postgres::bind_query_as;
-
-sea_query::sea_query_driver_postgres!();
+use crate::sea_query_driver_postgres::bind_query_as;
 
 pub async fn get_artists_by_song_id(id: &Ulid, db: &PgPool) -> Result<Vec<Artist>, Error> {
 	let (query, values) = Query::select()

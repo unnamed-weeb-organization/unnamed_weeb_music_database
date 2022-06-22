@@ -6,9 +6,7 @@ use sea_query::{Query, PostgresQueryBuilder, Expr};
 use sqlx::PgPool;
 use ulid::Ulid;
 
-use self::sea_query_driver_postgres::bind_query_as;
-
-sea_query::sea_query_driver_postgres!();
+use crate::sea_query_driver_postgres::bind_query_as;
 
 pub async fn get_releases_by_song_id(id: &Ulid, db: &PgPool) -> Result<Vec<Release>, Error> {
 	let (query, values) = Query::select()

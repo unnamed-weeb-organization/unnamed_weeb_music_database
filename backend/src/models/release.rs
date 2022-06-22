@@ -1,9 +1,9 @@
 use super::Name;
-use juniper::GraphQLEnum;
+use async_graphql::{Enum, Object};
 use sqlx::{FromRow, postgres::PgRow, Row};
 use ulid::Ulid;
 
-#[derive(GraphQLEnum, Clone, Debug, sqlx::Type)]
+#[derive(Enum, Copy, Clone, Debug, sqlx::Type, Eq, PartialEq)]
 pub enum ReleaseType {
     Album,
     Single,
@@ -84,21 +84,21 @@ impl sea_query::Iden for SongReleaseIden {
     }
 }
 
-#[graphql_object]
+#[Object]
 impl Release {
-    fn id(&self) -> String {
+    async fn id(&self) -> String {
         self.id.to_string()
     }
 
-    fn name(&self) -> &Name {
+    async fn name(&self) -> &Name {
         &self.name
     }
 
-    fn release_type(&self) -> &ReleaseType {
+    async fn release_type(&self) -> &ReleaseType {
         &self.release_type
     }
 
-    fn total_tracks(&self) -> &i32 {
+    async fn total_tracks(&self) -> &i32 {
         &self.total_tracks
     }
 

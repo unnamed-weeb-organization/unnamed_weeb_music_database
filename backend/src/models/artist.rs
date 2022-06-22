@@ -1,4 +1,5 @@
 use super::Name;
+use async_graphql::Object;
 use sea_query::Iden;
 use sqlx::{FromRow, postgres::PgRow, Row};
 use ulid::Ulid;
@@ -74,13 +75,13 @@ impl Iden for SongArtistIden {
     }
 }
 
-#[graphql_object]
+#[Object]
 impl Artist {
-    fn id(&self) -> String {
+    async fn id(&self) -> String {
         self.id.to_string()
     }
 
-    fn name(&self) -> &Name {
+    async fn name(&self) -> &Name {
         &self.name
     }
 }

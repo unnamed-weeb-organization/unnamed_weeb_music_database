@@ -1,17 +1,18 @@
-use juniper::{FieldResult};
+use async_graphql::{Object, Context};
+use sqlx::PgPool;
 
-use crate::{utils::context::Context, models::{song::Song, artist::Artist}};
+use crate::{models::{song::Song, artist::Artist}, utils::error::Error};
 
 #[derive(Clone, Debug)]
 pub struct Page {
 	pub page_info: PageInfo
 }
 
-#[graphql_object(context = Context)]
+#[Object]
 impl Page {
-	async fn songs<'ctx>(&self, id: Option<String>, search: Option<String>, artist_id: Option<String>, release_id: Option<String>, genres: Option<Vec<String>>, context: &'ctx Context) -> FieldResult<Vec<Song>> {
+	async fn songs<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, artist_id: Option<String>, release_id: Option<String>, genres: Option<Vec<String>>) -> Result<Vec<Song>, Error> {
         // Ok(Song)
-        let db = &*context.db;
+        let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::song::Options {
             id: None,
             search: None,
@@ -47,9 +48,9 @@ impl Page {
     }
 
     /// Get Artists
-    async fn artists<'ctx>(&self, id: Option<String>, search: Option<String>, song_id: Option<String>, release_id: Option<String>, context: &'ctx Context) -> FieldResult<Vec<Artist>> {
+    async fn artists<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, song_id: Option<String>, release_id: Option<String>) -> Result<Vec<Artist>, Error> {
         // Ok(Artist)
-        let db = &*context.db;
+        let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::artist::Options {
             id: None,
             search: None,

@@ -1,9 +1,7 @@
-use crate::utils::context::Context;
-
 use super::{artist::Artist, release::Release, Name, NewName};
-use juniper::graphql_object;
+use async_graphql::{Object, InputObject, Context};
 use sea_query::Iden;
-use sqlx::{FromRow, postgres::PgRow, Row};
+use sqlx::{FromRow, postgres::PgRow, Row, PgPool};
 use ulid::Ulid;
 
 #[derive(Clone, Debug)]
@@ -34,23 +32,23 @@ impl Iden for SongIden {
     }
 }
 
-#[graphql_object(Context = Context)]
+#[Object]
 impl Song {
-    fn id(&self) -> String {
+    async fn id(&self) -> String {
         self.id.to_string()
     }
 
-    fn name(&self) -> &Name {
+    async fn name(&self) -> &Name {
         &self.name
     }
 
-    async fn artists(&self, context: &Context) -> Vec<Artist> {
-        let db = &*context.db;
+    async fn artists<'ctx>(&self, context: &Context<'ctx>) -> Vec<Artist> {
+        let db = &*context.data_unchecked::<PgPool>();
         crate::database::artist::get_artists_by_song_id(&self.id, db).await.unwrap()
     }
 
-    async fn releases(&self, context: &Context) -> Vec<Release> {
-        let db = &*context.db;
+    async fn releases<'ctx>(&self, context: &Context<'ctx>) -> Vec<Release> {
+        let db = &*context.data_unchecked::<PgPool>();
         crate::database::release::get_releases_by_song_id(&self.id, db).await.unwrap()
     }
 }
@@ -67,7 +65,7 @@ impl<'r> FromRow<'r, PgRow> for Song {
     }
 }
 
-#[derive(Clone, Debug, juniper::GraphQLInputObject)]
+#[derive(Clone, Debug, InputObject)]
 pub struct NewSong {
     pub name: NewName,
     pub artists: Vec<String>,
