@@ -2,62 +2,90 @@ pub mod artist;
 pub mod release;
 pub mod song;
 
-use juniper::{GraphQLEnum, GraphQLObject};
+use std::error::Error;
 
+use async_graphql::{Enum, InputObject, Object};
 
-#[derive(GraphQLObject, Clone, Debug)]
+#[derive(Clone, Debug, InputObject)]
+pub struct NewName {
+    pub native: String,
+    pub romanized: String,
+    pub english: String,
+}
+
+#[derive(Clone, Debug, sqlx::Encode)]
 pub struct Name {
     /// Native name the original variant uses.
     ///
     /// "残酷な天使のテーゼ"
-    native: String,
+    pub native: String,
     /// Romanized variant of the native title.
     ///
     /// "Zankoku na Tenshi no Tēze"
-    romanized: String,
+    pub romanized: String,
     /// English translated name.
     ///
     /// "The Cruel Angel's Thesis"
-    english: String,
+    pub english: String,
 }
 
-#[derive(GraphQLEnum, Clone, Debug)]
+#[Object]
+impl Name {
+    pub async fn native(&self) -> &str {
+        &self.native
+    }
+
+    pub async fn romanized(&self) -> &str {
+        &self.romanized
+    }
+
+    pub async fn english(&self) -> &str {
+        &self.english
+    }
+}
+
+#[derive(Enum, Copy, Clone, Debug, Eq, PartialEq)]
 pub enum ExternalSite {
     AppleMusic,
     YouTube,
     Spotify,
 }
 
-#[derive(GraphQLObject, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct ExternalSites {
     site_type: ExternalSite,
     url: String,
 }
 
-#[automatically_derived]
-    impl<'r> ::sqlx::decode::Decode<'r, ::sqlx::Postgres> for Name {
-        fn decode(
-            value: ::sqlx::postgres::PgValueRef<'r>,
-        ) -> ::std::result::Result<
-            Self,
-            ::std::boxed::Box<
-                dyn ::std::error::Error + 'static + ::std::marker::Send + ::std::marker::Sync,
-            >,
-        > {
-            let mut decoder = ::sqlx::postgres::types::PgRecordDecoder::new(value)?;
-            let native = decoder.try_decode::<String>()?;
-            let romanized = decoder.try_decode::<String>()?;
-            let english = decoder.try_decode::<String>()?;
-            ::std::result::Result::Ok(Name {
-                native,
-                romanized,
-                english,
-            })
-        }
+#[Object]
+impl ExternalSites {
+    pub async fn site_type(&self) -> ExternalSite {
+        self.site_type
     }
-    #[automatically_derived]
-    impl ::sqlx::Type<::sqlx::Postgres> for Name {
-        fn type_info() -> ::sqlx::postgres::PgTypeInfo {
-            ::sqlx::postgres::PgTypeInfo::with_name("localized_name")
-        }
+
+    pub async fn url(&self) -> String {
+        self.url.clone()
     }
+}
+
+impl<'r> sqlx::decode::Decode<'r, sqlx::Postgres> for Name {
+    fn decode(
+        value: sqlx::postgres::PgValueRef<'r>,
+    ) -> Result<Self, Box<dyn Error + 'static + Send + Sync>> {
+        let mut decoder = sqlx::postgres::types::PgRecordDecoder::new(value)?;
+        let native = decoder.try_decode::<String>()?;
+        let romanized = decoder.try_decode::<String>()?;
+        let english = decoder.try_decode::<String>()?;
+        Ok(Name {
+            native,
+            romanized,
+            english,
+        })
+    }
+}
+
+impl sqlx::Type<sqlx::Postgres> for Name {
+    fn type_info() -> sqlx::postgres::PgTypeInfo {
+        sqlx::postgres::PgTypeInfo::with_name("localized_name")
+    }
+}

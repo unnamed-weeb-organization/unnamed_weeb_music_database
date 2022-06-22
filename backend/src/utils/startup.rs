@@ -21,13 +21,13 @@ pub async fn up(conf: super::config::Config) -> (ServerStart, SocketAddr) {
         .await
         .unwrap();
 
-    let ctx = crate::utils::context::Context::new(pool);
+    //let ctx = crate::utils::context::Context::new(pool);
 
     let schema = Arc::new(crate::controllers::graphql::make_schema());
 
     let router: Router<Body, io::Error> = Router::builder()
         .data(schema)
-        .data(ctx)
+        .data(pool)
         .middleware(Middleware::pre(middleware::logger))
         .middleware(Middleware::post(middleware::setup_headers))
         .scope("/", controllers::handle_routes())

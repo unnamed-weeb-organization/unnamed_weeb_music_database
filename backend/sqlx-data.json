@@ -1,5 +1,51 @@
 {
   "db": "PostgreSQL",
+  "09206fcf2d718128c7af4d90a45b6713202fd556786f6f718c7a6a1c9aa7a6de": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n\t\tselect\n\t\t\ts.id,\n\t\t\ts.name as \"name!: Name\"\n\t\tfrom\n\t\t\tsongs s\n\t\twhere lower((s.name).native) ~ lower($1) or lower((s.name).romanized) ~ lower($1) or lower((s.name).english) ~ lower($1);\n\t\t"
+  },
   "1c85fa04d95d643260221b64983647fda0e034649ef2b2052abb821ce8e98d99": {
     "describe": {
       "columns": [
@@ -45,6 +91,73 @@
       }
     },
     "query": "\n\t\t\tselect\n\t\t\t\ta.id,\n\t\t\t\ta.name as \"name!: Name\"\n\t\t\tfrom\n\t\t\t\tsongs_artists sa\n\t\t\tleft join artists a on (a.id = sa.artist_id)\n\t\t\twhere sa.song_id = $1;\n\t\t\t"
+  },
+  "3729356bb3bd994961a9e622de8b8f7dedde621adda25e80e1e648c14464a9a3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        ]
+      }
+    },
+    "query": "\n\t\tinsert into songs (id, \"name\")\n\t\tvalues ($1, $2)\n\t\treturning id, name as \"name!: Name\";\n\t\t"
   },
   "46932bb0ca94ce58de65414323872ca1f8025462b5d0b85643d03b0e200fb61f": {
     "describe": {
@@ -115,7 +228,7 @@
     },
     "query": "\n\t\t\tselect\n\t\t\t\tr.id,\n\t\t\t\tr.name as \"name!: Name\",\n\t\t\t\tr.release_type as \"release_type!: ReleaseType\",\n\t\t\t\tr.total_tracks as \"total_tracks!: i32\"\n\t\t\tfrom\n\t\t\t\tsongs_releases sr\n\t\t\tleft join releases r on (r.id = sr.releases_id)\n\t\t\twhere sr.songs_id = $1;\n\t\t\t"
   },
-  "ba7561c27eab4d1f74e3da69c92916f5b3e1555b85cb2e19e8c7de8e63ee921e": {
+  "dabf4986c2d0c22081c9ae5fc487426094b5f6518324a53e166f872923d65a09": {
     "describe": {
       "columns": [
         {
@@ -159,6 +272,52 @@
         ]
       }
     },
-    "query": "\n\t\t\tselect\n\t\t\t\ts.id,\n\t\t\t\ts.name as \"name!: Name\"\n\t\t\tfrom\n\t\t\t\tsongs s\n\t\t\twhere s.id = $1;\n\t\t\t"
+    "query": "\n\t\tselect\n\t\t\ts.id,\n\t\t\ts.name as \"name!: Name\"\n\t\tfrom\n\t\t\tsongs s\n\t\twhere s.id = $1;\n\t\t"
+  },
+  "e7c57624126b3fda6d36c13515277328c3457d8337b5c00f19cd315e85dcc91e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "name!: Name",
+          "ordinal": 1,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Composite": [
+                  [
+                    "native",
+                    "Text"
+                  ],
+                  [
+                    "romanized",
+                    "Text"
+                  ],
+                  [
+                    "english",
+                    "Text"
+                  ]
+                ]
+              },
+              "name": "localized_name"
+            }
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n\t\tselect\n\t\t\ts.id,\n\t\t\ts.name as \"name!: Name\"\n\t\tfrom\n\t\t\tsongs_artists sa\n\t\tleft join songs s on (s.id = sa.song_id)\n\t\twhere sa.artist_id = $1;\n\t\t"
   }
 }

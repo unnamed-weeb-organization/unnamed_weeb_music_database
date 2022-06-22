@@ -25,24 +25,24 @@ pub struct Config {
     pub name: String,
     pub ip: IpAddr,
     pub port: u16,
-	pub db: Db,
+    pub db: Db,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Db {
-	pub max_connections: u32,
-	pub connect_timeout: std::time::Duration,
-	pub url: String,
+    pub max_connections: u32,
+    pub connect_timeout: std::time::Duration,
+    pub url: String,
 }
 
 impl Default for Db {
-	fn default() -> Self {
-		Self {
-			max_connections: constants::DB_DEFAULT_MAX_CONNECTIONS,
-			connect_timeout: constants::DB_DEFAULT_CONNECT_TIMEOUT,
-			url: constants::DB_DEFAULT_URL.to_string(),
-		}
-	}
+    fn default() -> Self {
+        Self {
+            max_connections: constants::DB_DEFAULT_MAX_CONNECTIONS,
+            connect_timeout: constants::DB_DEFAULT_CONNECT_TIMEOUT,
+            url: constants::DB_DEFAULT_URL.to_string(),
+        }
+    }
 }
 
 impl Default for Config {
@@ -51,7 +51,7 @@ impl Default for Config {
             name: String::new(),
             ip: constants::SERVER_DEFAULT_IP,
             port: constants::SERVER_DEFAULT_PORT,
-			db: Db::default(),
+            db: Db::default(),
         }
     }
 }

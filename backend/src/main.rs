@@ -1,13 +1,14 @@
+#![allow(clippy::manual_map)]
 mod constants;
 mod controllers;
+mod database;
 mod models;
 mod utils;
-mod database;
 
 use tracing::info;
 use utils::{config, startup};
 
-#[macro_use] extern crate juniper;
+sea_query::sea_query_driver_postgres!();
 
 #[tokio::main]
 async fn main() {

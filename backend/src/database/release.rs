@@ -1,49 +1,36 @@
 use crate::{
-    models::{Name, release::{Release, ReleaseType}},
+    models::release::{Release, ReleaseIden, SongReleaseIden},
     utils::error::Error,
 };
-use sqlx::{PgPool, query_unchecked};
+use sea_query::{Expr, PostgresQueryBuilder, Query};
+use sqlx::PgPool;
 use ulid::Ulid;
 
-impl Release {
+use crate::sea_query_driver_postgres::bind_query_as;
 
-	pub fn new(id: String, name: Name, release_type: ReleaseType, total_tracks: i32) -> Self {
-		Self {
-			id: Ulid::from_string(&id).unwrap(),
-			name,
-			release_type,
-			total_tracks,
-		}
-	}
+pub async fn get_releases_by_song_id(id: &Ulid, db: &PgPool) -> Result<Vec<Release>, Error> {
+    let (query, values) = Query::select()
+        .columns([
+            (ReleaseIden::Table, ReleaseIden::Id),
+            (ReleaseIden::Table, ReleaseIden::Name),
+            (ReleaseIden::Table, ReleaseIden::ReleaseType),
+            (ReleaseIden::Table, ReleaseIden::TotalTracks),
+        ])
+        .from(SongReleaseIden::Table)
+        .join(
+            sea_query::JoinType::LeftJoin,
+            ReleaseIden::Table,
+            Expr::col(SongReleaseIden::ReleaseId).equals(ReleaseIden::Table, ReleaseIden::Id),
+        )
+        .and_where(Expr::col(SongReleaseIden::SongId).eq(id.to_string()))
+        .build(PostgresQueryBuilder);
 
-	pub async fn get_releases_by_song_id(id: &Ulid, db: &PgPool) -> Result<Vec<Self>, Error> {
-		let release = query_unchecked!(
-			r#"
-			select
-				r.id,
-				r.name as "name!: Name",
-				r.release_type as "release_type!: ReleaseType",
-				r.total_tracks as "total_tracks!: i32"
-			from
-				songs_releases sr
-			left join releases r on (r.id = sr.releases_id)
-			where sr.songs_id = $1;
-			"#, id.to_string()
-		)
-		.fetch_all(db)
-		.await
-		.unwrap();
-		
-		let mut releases: Vec<Release> = Vec::new();
+    println!("{}", query);
 
-		for r in release {
-			let res_release = Release::new(r.id, r.name, r.release_type, r.total_tracks);
-			releases.push(res_release);
-		}
+    let releases: Vec<Release> = bind_query_as(sqlx::query_as(&query), &values)
+        .fetch_all(db)
+        .await
+        .unwrap();
 
-
-		Ok(releases)
-	}
-
-
+    Ok(releases)
 }
