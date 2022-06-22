@@ -1,9 +1,14 @@
-use crate::{models::{song::{Song, NewSong}, Name, artist::Artist}, controllers::page::{Page, PageInfo}, utils::error::Error};
-use hyper::{Body, Request, Response};
-use async_graphql::{
-    http::graphiql_source,
-    Schema, EmptySubscription, Object, Context
+use crate::{
+    controllers::page::{Page, PageInfo},
+    models::{
+        artist::Artist,
+        song::{NewSong, Song},
+        Name,
+    },
+    utils::error::Error,
 };
+use async_graphql::{http::graphiql_source, Context, EmptySubscription, Object, Schema};
+use hyper::{Body, Request, Response};
 use routerify::prelude::*;
 use sqlx::PgPool;
 use std::{io, sync::Arc};
@@ -14,7 +19,10 @@ pub async fn graphiql(_: Request<Body>) -> Result<Response<Body>, io::Error> {
 }
 
 pub async fn graphql(req: Request<Body>) -> Result<Response<Body>, io::Error> {
-    let schema = &*req.data::<Arc<Schema<QueryRoot, MutationRoot, EmptySubscription>>>().unwrap().clone();
+    let schema = &*req
+        .data::<Arc<Schema<QueryRoot, MutationRoot, EmptySubscription>>>()
+        .unwrap()
+        .clone();
     let db = req.data::<PgPool>().unwrap().clone();
     let request = deserialize_body(req.into_body()).await?;
     let response = schema.execute(request.data(db)).await;
@@ -28,7 +36,15 @@ pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn song<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, artist_id: Option<String>, release_id: Option<String>, genres: Option<Vec<String>>) -> Result<Song, Error> {
+    async fn song<'ctx>(
+        &self,
+        context: &Context<'ctx>,
+        id: Option<String>,
+        search: Option<String>,
+        artist_id: Option<String>,
+        release_id: Option<String>,
+        genres: Option<Vec<String>>,
+    ) -> Result<Song, Error> {
         // Ok(Song)
         let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::song::Options {
@@ -64,7 +80,14 @@ impl QueryRoot {
         Ok(crate::database::song::get_song(&options, db).await.unwrap())
     }
 
-    async fn artist<'ctx>(&self, context: &Context<'ctx>, id: Option<String>, search: Option<String>, song_id: Option<String>, release_id: Option<String>) -> Result<Artist, Error> {
+    async fn artist<'ctx>(
+        &self,
+        context: &Context<'ctx>,
+        id: Option<String>,
+        search: Option<String>,
+        song_id: Option<String>,
+        release_id: Option<String>,
+    ) -> Result<Artist, Error> {
         // Ok(Artist)
         let db = &*context.data_unchecked::<PgPool>();
         let mut options = crate::models::artist::Options {
@@ -92,7 +115,9 @@ impl QueryRoot {
             options.release_id = Some(release_id);
         }
 
-        Ok(crate::database::artist::get_artist(&options, db).await.unwrap())
+        Ok(crate::database::artist::get_artist(&options, db)
+            .await
+            .unwrap())
     }
 
     async fn page<'ctx>(&self, page: Option<i32>, per_page: Option<i32>) -> Result<Page, Error> {
@@ -115,10 +140,7 @@ impl QueryRoot {
         } */
         //println!("{:?}", page_children);
 
-
-        Ok(Page {
-            page_info,
-        })
+        Ok(Page { page_info })
     }
 }
 
@@ -126,11 +148,7 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
-    async fn create_song<'a>(
-        &self,
-        context: &Context<'a>,
-        input: NewSong,
-    ) -> Result<Song, Error> {
+    async fn create_song<'a>(&self, context: &Context<'a>, input: NewSong) -> Result<Song, Error> {
         // Ok(Song)
         let db = &*context.data_unchecked::<PgPool>();
         let ulid = ulid::Ulid::new();
@@ -142,14 +160,17 @@ impl MutationRoot {
         let artists = input.artists;
         let releases = input.releases;
 
-        Ok(crate::database::song::create_song(ulid, name, artists, Some(releases), db).await.unwrap())
+        Ok(
+            crate::database::song::create_song(ulid, name, artists, Some(releases), db)
+                .await
+                .unwrap(),
+        )
         //todo!()
     }
 }
 
 pub fn make_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
-    Schema::build(QueryRoot {}, MutationRoot, EmptySubscription)
-        .finish()
+    Schema::build(QueryRoot {}, MutationRoot, EmptySubscription).finish()
 }
 
 async fn deserialize_body(body: Body) -> Result<async_graphql::Request, io::Error> {
@@ -157,14 +178,10 @@ async fn deserialize_body(body: Body) -> Result<async_graphql::Request, io::Erro
     // Set the options for the request.
     let options = async_graphql::http::MultipartOptions::default();
 
-
     // Convert the bytes into a cursor. To get an implementation of AsyncRead.
     let reader = futures::io::Cursor::new(bytes);
 
     let req = async_graphql::http::receive_body(Some("application/json"), reader, options).await;
 
-    req.map_err(|err| {
-        io::Error::new(io::ErrorKind::Other, err)
-    })
-
+    req.map_err(|err| io::Error::new(io::ErrorKind::Other, err))
 }

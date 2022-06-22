@@ -1,13 +1,12 @@
 #![allow(clippy::manual_map)]
 mod constants;
 mod controllers;
+mod database;
 mod models;
 mod utils;
-mod database;
 
 use tracing::info;
 use utils::{config, startup};
-
 
 sea_query::sea_query_driver_postgres!();
 

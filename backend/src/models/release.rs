@@ -1,6 +1,6 @@
 use super::Name;
 use async_graphql::{Enum, Object};
-use sqlx::{FromRow, postgres::PgRow, Row};
+use sqlx::{postgres::PgRow, FromRow, Row};
 use ulid::Ulid;
 
 #[derive(Enum, Copy, Clone, Debug, sqlx::Type, Eq, PartialEq)]
@@ -43,7 +43,7 @@ pub enum ReleaseIden {
     Id,
     Name,
     ReleaseType,
-    TotalTracks
+    TotalTracks,
 }
 
 impl sea_query::Iden for ReleaseIden {
@@ -56,7 +56,7 @@ impl sea_query::Iden for ReleaseIden {
                 ReleaseIden::Id => "id",
                 ReleaseIden::Name => "name",
                 ReleaseIden::ReleaseType => "release_type",
-                ReleaseIden::TotalTracks => "total_tracks"
+                ReleaseIden::TotalTracks => "total_tracks",
             }
         )
         .unwrap();
@@ -66,7 +66,7 @@ impl sea_query::Iden for ReleaseIden {
 pub enum SongReleaseIden {
     Table,
     SongId,
-    ReleaseId
+    ReleaseId,
 }
 
 impl sea_query::Iden for SongReleaseIden {
@@ -77,7 +77,7 @@ impl sea_query::Iden for SongReleaseIden {
             match self {
                 SongReleaseIden::Table => "songs_releases",
                 SongReleaseIden::SongId => "songs_id",
-                SongReleaseIden::ReleaseId => "releases_id"
+                SongReleaseIden::ReleaseId => "releases_id",
             }
         )
         .unwrap();

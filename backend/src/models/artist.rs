@@ -1,7 +1,7 @@
 use super::Name;
 use async_graphql::Object;
 use sea_query::Iden;
-use sqlx::{FromRow, postgres::PgRow, Row};
+use sqlx::{postgres::PgRow, FromRow, Row};
 use ulid::Ulid;
 
 // #[derive(GraphQLEnum)]
@@ -36,7 +36,7 @@ impl<'r> FromRow<'r, PgRow> for Artist {
 pub enum ArtistIden {
     Table,
     Id,
-    Name
+    Name,
 }
 
 impl Iden for ArtistIden {
@@ -47,7 +47,7 @@ impl Iden for ArtistIden {
             match self {
                 ArtistIden::Table => "artists",
                 ArtistIden::Id => "id",
-                ArtistIden::Name => "name"
+                ArtistIden::Name => "name",
             }
         )
         .unwrap();
@@ -57,7 +57,7 @@ impl Iden for ArtistIden {
 pub enum SongArtistIden {
     Table,
     ArtistId,
-    SongId
+    SongId,
 }
 
 impl Iden for SongArtistIden {
@@ -68,7 +68,7 @@ impl Iden for SongArtistIden {
             match self {
                 SongArtistIden::Table => "songs_artists",
                 SongArtistIden::ArtistId => "artist_id",
-                SongArtistIden::SongId => "song_id"
+                SongArtistIden::SongId => "song_id",
             }
         )
         .unwrap();
@@ -93,5 +93,5 @@ pub struct Options {
     pub song_id: Option<String>,
     pub release_id: Option<String>,
     pub page: Option<i32>,
-    pub per_page: Option<i32>
+    pub per_page: Option<i32>,
 }
