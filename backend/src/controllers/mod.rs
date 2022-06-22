@@ -1,4 +1,5 @@
 pub mod graphql;
+pub mod page;
 
 use hyper::{Body, Method};
 use routerify::Router;

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Context {
 	pub db: Arc<sqlx::postgres::PgPool>,
 }

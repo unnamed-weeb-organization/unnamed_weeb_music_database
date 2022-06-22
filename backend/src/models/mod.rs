@@ -5,7 +5,6 @@ pub mod song;
 use std::error::Error;
 
 use juniper::{GraphQLEnum, GraphQLObject};
-use sea_query::enum_def;
 
 #[derive(Clone, Debug, juniper::GraphQLInputObject)]
 pub struct NewName {
@@ -15,7 +14,6 @@ pub struct NewName {
 }
 
 #[derive(GraphQLObject, Clone, Debug, sqlx::Encode)]
-#[enum_def]
 pub struct Name {
     /// Native name the original variant uses.
     ///
