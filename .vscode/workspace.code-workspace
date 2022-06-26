@@ -1,6 +1,9 @@
 {
   "extensions": {
-    "recommendations": ["rust-lang.rust-analyzer", "vadimcn.vscode-lldb"]
+    "recommendations": [
+      "rust-lang.rust-analyzer",
+      "vadimcn.vscode-lldb",
+    ]
   },
   "folders": [
     {
@@ -8,9 +11,15 @@
       "path": "../backend"
     },
     {
+      "name": "Frontend",
+      "path": "../frontend"
+    },
+    {
       "name": "Root",
       "path": ".."
     }
   ],
-  "settings": {}
+  "settings": {
+    "rust-analyzer.checkOnSave.command": "clippy"
+  }
 }
