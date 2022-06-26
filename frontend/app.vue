@@ -11,19 +11,17 @@
 </script>
 
 <template>
+	<div class="flex flex-col h-full">Hello World!</div>
 </template>
 
-<style>
+<style lang="scss">
 	@import "assets/css/fonts.css";
 
-	.nunito {
+	html,
+	body {
+		height: 100vh;
 		font-family: "Nunito Sans";
-		font-weight: normal;
-		font-size: larger;
-	}
-
-	.rubik {
-		font-family: "Rubik";
-		font-size: larger;
+		background-color: var(--background);
+		color: var(--300);
 	}
 </style>

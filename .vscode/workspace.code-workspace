@@ -3,8 +3,6 @@
     "recommendations": [
       "rust-lang.rust-analyzer",
       "vadimcn.vscode-lldb",
-      "Vue.volar",
-      "esbenp.prettier-vscode"
     ]
   },
   "folders": [

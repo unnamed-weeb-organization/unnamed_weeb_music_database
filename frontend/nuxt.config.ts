@@ -7,5 +7,11 @@ export default defineNuxtConfig({
 	typescript: {
 		strict: true,
 	},
-	modules: ["@pinia/nuxt"],
+	modules: ["@pinia/nuxt", "nuxt-windicss"],
+	windicss: {
+		analyze: {
+			analysis: { interpretUtilities: true },
+			server: { port: 3001 },
+		},
+	},
 });
