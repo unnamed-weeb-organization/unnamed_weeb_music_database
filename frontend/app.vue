@@ -11,14 +11,17 @@
 </script>
 
 <template>
-	<div class="flex flex-col h-full">Hello World!</div>
+	<div class="flex flex-col h-full">
+	</div>
 </template>
 
 <style lang="scss">
-	@import "assets/css/fonts.css";
+	@use "assets/css/fonts.css";
+	@use "assets/css/themes.scss";
 
 	html,
-	body {
+	body,
+	#__nuxt {
 		height: 100vh;
 		font-family: "Nunito Sans";
 		background-color: var(--background);
