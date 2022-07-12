@@ -1,5 +1,7 @@
-export default defineNuxtPlugin((app) => {
-	const lastTheme = () => localStorage.getItem("theme") ?? "default";
+import flavors from "./flavors";
+
+export default defineNuxtPlugin(() => {
+	const lastTheme = () => localStorage.getItem("theme") ?? flavors[0].key;
 	const lastMode = () => localStorage.getItem("mode") ?? "light";
 
 	const classList = document.documentElement.classList;
@@ -7,17 +9,17 @@ export default defineNuxtPlugin((app) => {
 	classList.add(lastTheme(), lastMode());
 
 	const themes: ThemeManager = {
-		currentMode() {
+		currentMode: () => {
 			return lastMode() as ThemeMode;
 		},
-		currentTheme() {
+		currentTheme: () => {
 			return lastTheme();
 		},
-		changeMode(themeMode: ThemeMode) {
+		changeMode: (themeMode: ThemeMode) => {
 			if (classList.replace(lastMode(), themeMode))
 				localStorage.setItem("mode", themeMode);
 		},
-		changeTheme(themeName) {
+		changeTheme: (themeName) => {
 			if (classList.replace(lastTheme(), themeName))
 				localStorage.setItem("theme", themeName);
 		},
